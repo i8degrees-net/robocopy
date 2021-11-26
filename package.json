@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "dotenv": "10.0.0",
+    "npm-run-all": "4.1.5",
+    "yargs": "17.2.1"
+  },
+  "type": "module",
+  "name": "@i8degrees-net/robocopy",
+  "version": "0.0.1",
+  "description": "efficient file transfer on windows",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:old": "node -r dotenv/config index.js"
+  },
+  "author": "Jeffrey Carpenter <i8degrees@gmail.com> (https://github.com/i8degrees)",
+  "license": "BSD-2-Clause"
+}
