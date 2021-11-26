@@ -34,6 +34,11 @@ let modeDebug = process.env[`ROBOCOPY_DEBUG`] || false;
 
 import yargs from 'yargs';
 
+function assign(target, source, ...args) {
+  let result = Object.assign(target, source, args);
+  return(result);
+}
+
 function pathExists(path, callback = noop) {
   return fs.exists((err, result) => {
     if(err) {
@@ -59,15 +64,15 @@ let DEFAULT_FILE_OPTIONS = {
 
 async function readFileSync(path, params) {
   let result = null;
-  let options = Object.assign(DEFAULT_FILE_OPTIONS, params);
-  
+  let options = assign(DEFAULT_FILE_OPTIONS, params);
+
   result = await fs.readFileSync(path, options);
   return(result);
 }
 
 function readFile(path, params, callback = noop) {
   let result = null;
-  let options = Object.assign(DEFAULT_FILE_OPTIONS, params);
+  let options = assign(DEFAULT_FILE_OPTIONS, params);
   return fs.readFile(path, (err, results) => {
     if(err) {
       console.error(err);
@@ -132,7 +137,7 @@ let DEFAULT_PARAMS = [
   `/LOG+:${process.env['LOG_FILE']}`, // open log file in APPEND mode
 ];
 
-let ARGS_SEPERATOR = process.env[`ROBOCOPY_ARGS_SEPERATOR`] || 
+let ARGS_SEPERATOR = process.env[`ROBOCOPY_ARGS_SEPERATOR`] ||
   `\n`;
 
 let CRITICAL_ARRAY_EMPTY = (args) => {
@@ -140,7 +145,7 @@ let CRITICAL_ARRAY_EMPTY = (args) => {
 };
 
 function execute(cmd, params = []) {
-  let args = Object.assign([], params);
+  let args = assign([], params);
 
   if(modeDry) {
     console.debug(`${cmd} ${args.join(ARGS_SEPERATOR)}`);
@@ -165,16 +170,16 @@ function execute(cmd, params = []) {
   if(args.length < 1) {
     return args;
   }
-  
+
   return args.join(ARGS_SEPERATOR);
 }
 
 function execute_robocopy(params = [], files_filter = [], dirs_filter = []) {
   let result = null;
-  let cmd = params && params.length > 0 && params[0] || 
+  let cmd = params && params.length > 0 && params[0] ||
     `robocopy.exe`;
 
-  let args = Object.assign(DEFAULT_PARAMS, params);
+  let args = assign(DEFAULT_PARAMS, params);
   if(!args || args.length < 1) {
     const errMsg = CRITICAL_EMPTY_ARRAY(args);
     return console.error(errMsg);
@@ -240,7 +245,7 @@ async function main(argc = 0, argv = []) {
 
   console.debug(await readFileSync(`./dirs_ignore.conf`));
   console.debug(await readFileSync(`./files_ignore.conf`));
-  
+
   process.argv.forEach((el, idx) => {
     if(!el) {
       return;
@@ -250,14 +255,14 @@ async function main(argc = 0, argv = []) {
       return;
     }
 
-    // NOTE(jeff): First, let us do the optional arguments 
+    // NOTE(jeff): First, let us do the optional arguments
     // parsing!
     if(el.includes(`/mir`) == true) {
       args.push(`/MIR`);
     } else if(el.includes(`/MIR`) == true) {
       args.push(`/MIR`);
-    } 
-    
+    }
+
     if(el.includes("source:") == true) {
       let sourceStr = el.substring(7,255);
 console.debug(`source:${sourceStr}`);
