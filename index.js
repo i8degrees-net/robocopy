@@ -201,6 +201,7 @@ async function main(argc = 0, argv = []) {
       args.push(`/MIR`);
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
     if(el.includes("source:") == true) {
       let sourceStr = el.substring(7,255);
 console.debug(`source:${sourceStr}`);
@@ -210,6 +211,7 @@ console.debug(`source:${sourceStr}`);
       //process.exit(1);
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
     if(el.includes("dest:")) {
       let destStr = el.substring(5,255);
 console.debug(`dest:${destStr}`);
