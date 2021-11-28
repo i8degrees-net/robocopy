@@ -5,7 +5,7 @@ import {parse} from 'path';
 
 export
 const DEFAULT_FILE_OPTIONS = {
-  encoding: `utf8`,
+  // encoding: null
 };
 
 export
@@ -46,7 +46,7 @@ async function readFileSync(path, params) {
   let options = assign(DEFAULT_FILE_OPTIONS, params);
 
   result = await fs.readFileSync(path, options);
-  return(result);
+  return(result.toString());
 }
 
 export
@@ -63,7 +63,7 @@ function readFile(path, params, callback = noop) {
     }
 
     if(results) {
-      return callback(null, results);
+      return callback(null, results.toString());
     }
   });
 }

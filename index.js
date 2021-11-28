@@ -42,22 +42,42 @@ import yargs from 'yargs';
 
 function build_file_list(list) {
   let result = [];
-  list.forEach((el) => {
-    if(el) {
-      result.push(`/xf ${el}`);
-    }
-  });
+  if(typeof list === `string`) {
+    let element = list.split(`\n`);
+    let noWordIdx = element.indexOf(``);
+    element.splice(noWordIdx, 1);
+    element.forEach((el) => {
+      if(el) {
+        result.push(`/xf ${el}`);
+      }
+    });
+  } else if(typeof list === `array`) {
+    list.forEach((el) => {
+      if(el) {
+        result.push(`/xf ${el}`);
+      }
+    });
+  }
 
   return result;
 }
 
 function build_dir_list(list) {
   let result = [];
-  list.forEach((el) => {
+  if(typeof list === `string`) {
+    let element = list.split(`\n`);
+    let noWordIdx = element.indexOf(``);
+    element.splice(noWordIdx, 1);
+    element.forEach((el) => {
+      if(el) {
+        result.push(`/xd ${el}`);
+      }
+    });
+  } else if(typeof list === `array`) {
     if(el) {
       result.push(`/xd ${el}`);
     }
-  });
+  }
 
   return result;
 }
@@ -112,7 +132,7 @@ function execute(cmd, params = []) {
   return args.join(ARGS_SEPERATOR);
 }
 
-function execute_robocopy(params = [], files_filter = [], dirs_filter = []) {
+function execute_robocopy(params = [], files_filter, dirs_filter) {
   let result = null;
   let cmd = params && params.length > 0 && params[0] ||
     `robocopy.exe`;
@@ -146,33 +166,27 @@ function execute_robocopy(params = [], files_filter = [], dirs_filter = []) {
     if(el) {
       args.push(el);
     }
-
+      files_filter.forEach((el) => {
+        if(el) {
+          args.push(el);
+        }
+      });
+      dirs_filter.forEach((el) => {
+        if(el) {
+          args.push(el);
+        }
+      });
   });
-
-  if(files_filter && files_filter.length > 0) {
-    files_filter.forEach((el) => {
-      if(el) {
-        args.push(el);
-      }
-    });
-  }
-
-  if(dirs_filter && dirs_filter.length > 0) {
-    dirs_filter.forEach((el) => {
-      if(el) {
-        args.push(el);
-      }
-    });
-  }
-
   result = execute(cmd, args);
   return(result);
 }
 
 async function main(argc = 0, argv = []) {
-  let files_filter = build_file_list(DEFAULT_FILTERED_FILES);
-  let dirs_filter = build_dir_list(DEFAULT_FILTERED_DIRS);
-
+  const dirsList = await readFileSync(`dirs.ignore`);
+  const filesList = await readFileSync(`files.ignore`);
+  let files_filter = build_file_list(filesList);
+  let dirs_filter = build_dir_list(dirsList);
+  //let dirs_filter = build_dir_list(DEFAULT_FILTERED_DIRS);
   let args = [
     `C:/Users/i8deg/Software`,
     `D:/Software`,
@@ -180,9 +194,6 @@ async function main(argc = 0, argv = []) {
     // `dest:D:/Software`,
   ];
   args = [];
-
-  console.debug(await readFileSync(`./dirs_ignore.conf`));
-  console.debug(await readFileSync(`./files_ignore.conf`));
 
   process.argv.forEach((el, idx) => {
     if(!el) {
@@ -196,8 +207,6 @@ async function main(argc = 0, argv = []) {
     // NOTE(jeff): First, let us do the optional arguments
     // parsing!
     if(el.includes(`/mir`) == true) {
-      args.push(`/MIR`);
-    } else if(el.includes(`/MIR`) == true) {
       args.push(`/MIR`);
     }
 
