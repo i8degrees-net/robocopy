@@ -32,5 +32,4 @@ ehthumbs.db
 !.env.defaults
 
 # local conf
-dirs_ignore.conf
-files_ignore.conf
+ignore.conf
