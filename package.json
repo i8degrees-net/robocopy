@@ -9,7 +9,7 @@
   },
   "type": "module",
   "name": "@i8degrees-net/robocopy",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "efficient file transfer on windows",
   "main": "index.js",
   "scripts": {
