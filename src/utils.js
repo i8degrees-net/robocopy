@@ -34,9 +34,9 @@ function pathExists(path, callback = noop) {
 }
 
 export
-async function pathExistsSync(path) {
+function pathExistsSync(path) {
   let result = false;
-  result = await fs.existsSync(path);
+  result = fs.existsSync(path);
   return(!!result);
 }
 
