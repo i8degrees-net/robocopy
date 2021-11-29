@@ -13,7 +13,7 @@
   "description": "efficient file transfer on windows",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node -r dotenv/config index.js",
     "start:old": "node -r dotenv/config index.js"
   },
   "author": "Jeffrey Carpenter <i8degrees@gmail.com> (https://github.com/i8degrees)",
