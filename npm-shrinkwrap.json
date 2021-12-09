@@ -1,17 +1,20 @@
 {
   "name": "@i8degrees-net/robocopy",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@i8degrees-net/robocopy",
-      "version": "0.0.1",
+      "version": "0.2.0",
       "license": "BSD-2-Clause",
       "dependencies": {
         "dotenv": "10.0.0",
         "npm-run-all": "4.1.5",
         "yargs": "17.2.1"
+      },
+      "engines": {
+        "node": "14.18.1"
       }
     },
     "node_modules/ansi-regex": {
