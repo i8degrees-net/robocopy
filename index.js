@@ -123,7 +123,7 @@ function execute(cmd, params = []) {
   });
 
   bat.stderr.on(`data`, (output) => {
-    console.error(ouitput.toString());
+    console.error(output.toString());
   });
 
   bat.on(`exit`, (code) => {
@@ -143,7 +143,7 @@ function usage_help() {
   console.log(`${SCRIPT_NAME} - a source and destination path must be given as your input.`);
 }
 
-function execute_robocopy(params = [], ignore_filter) {
+function execute_robocopy(params = []) {
   let result = null;
   let cmd = params && params.length > 0 && params[0] ||
     `robocopy.exe`;
@@ -153,32 +153,7 @@ function execute_robocopy(params = [], ignore_filter) {
     const errMsg = CRITICAL_EMPTY_ARRAY(args);
     return console.error(errMsg);
   }
-/*
-  let pIdx = 0;
-  let pIdxValid = 0;
-  args.forEach((el, idx, arr) => {
-    pIdx = idx;
-    if(el) {
-      let p = parse(el);
-      if(p != null) {
-        pIdxValid = (pIdxValid + 1);
-      }
-    }
-
-    pIdx = idx;
-  });
-
-  if(pIdxValid < 2) {
-    console.error(`A source and destination path must be given.\n\n${pIdxValid}\n${pIdx}`);
-    return;
-  }
-*/
-  ignore_filter.forEach((el) => {
-    if(el) {
-      args.push(el);
-    }
-    });
-console.log(args);
+  
   result = execute(cmd, args);
   return(result);
 }
@@ -209,6 +184,14 @@ async function main(argc = 0, argv = []) {
     args.push(`/MIR`);
   }
 
+  if(argv.includes(`-n`) == true) {
+    modeDry = true;
+  }
+
+  if(argv.includes(`dry`) == true) {
+    modeDry = true;
+  }
+
   if(argv.includes(`/opt`) == true) {
     args.push(`/OPT`);
   }
@@ -226,11 +209,16 @@ async function main(argc = 0, argv = []) {
     console.info(`Execution log file has been explicitly disabled.`);
   }
 
+  filter.forEach((el) => {
+    if(el) {
+      args.push(el);
+    }
+  });
+
   argv.forEach((arg, idx) => {
     if(!arg) {
       return;
     }
-console.log(arg);
     if(idx == 0) {
       return;
     }
@@ -238,30 +226,24 @@ console.log(arg);
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
     if(arg.includes("source:") == true) {
       let sourceStr = arg.substring(7,255);
-// console.debug(`source:${sourceStr}`);
+console.debug(`source:${sourceStr}`);
       args.push(`${sourceStr}`);
     } else if(arg.includes("source:") == false) {
       console.error(`CRITICAL: A source path must be given.`);
-      // process.exit(1);
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
     if(arg.includes("dest:")) {
       let destStr = arg.substring(5,255);
-// console.debug(`dest:${destStr}`);
+console.debug(`dest:${destStr}`);
       args.push(`${destStr}`);
     } else if(args.includes(`dest:`) == false) {
       console.error(`CRITICAL: A destination path must be given.`);
-      // process.exit(1);
     }
 
   });
 
-
-  let output = execute_robocopy(args, filter);
-  if(modeVerbose == true || modeDebug == true) {
-    console.info(output);
-  }
+  execute_robocopy(args);
   process.exit(0);
 }
 
