@@ -153,21 +153,47 @@ function execute_robocopy(params = []) {
     const errMsg = CRITICAL_EMPTY_ARRAY(args);
     return console.error(errMsg);
   }
-  
+
+  if(modeDebug) {
+    console.debug(args);
+  }
+
   result = execute(cmd, args);
   return(result);
 }
 
 async function main(argc = 0, argv = []) {
-  const parsedFilterConfig = await readFileSync(`ignore.conf`);
-  let filter = build_ignore_list(parsedFilterConfig);
-  let args = [
-    //`C:/Users/i8deg/Software`,
-    //`D:/Software`,
-    // `source:C:/Users/i8deg/Software`,
-    // `dest:D:/Software`,
-  ];
-  args = [];
+  // let args = [];
+  let filter = [];
+  let args = argv;
+
+  let ignoreListFile = `ignore.conf`;
+  if(pathExistsSync(ignoreListFile) == false) {
+    console.log(`ignore.conf was not found.`);
+
+    filter = [];
+    DEFAULT_FILTERED_FILES.forEach((el) => {
+      if(el) {
+        filter.push(el);
+      }
+    });
+    DEFAULT_FILTERED_DIRS.forEach((el) => {
+      if(el) {
+        filter.push(el);
+      }
+    });
+
+  } else {
+    console.log(`ignore.conf was found and is being consulted.`);
+    const parsedFilterConfig = await readFileSync(ignoreListFile);
+    filter = build_ignore_list(parsedFilterConfig);
+  }
+
+  filter.forEach((el) => {
+    if(el) {
+      args.push(el);
+    }
+  });
 
   if(argc < 1) {
     usage_help();
@@ -180,20 +206,16 @@ async function main(argc = 0, argv = []) {
 
   // NOTE(jeff): First, let us do the optional arguments
   // parsing!
-  if(argv.includes(`/mir`) == true) {
+  if(args.includes(`/mir`) == true) {
     args.push(`/MIR`);
   }
 
-  if(argv.includes(`-n`) == true) {
+  if(args.includes(`-n`) == true) {
     modeDry = true;
   }
 
-  if(argv.includes(`dry`) == true) {
+  if(args.includes(`dry`) == true) {
     modeDry = true;
-  }
-
-  if(argv.includes(`/opt`) == true) {
-    args.push(`/OPT`);
   }
 
   if(useLogFile) {
@@ -208,14 +230,8 @@ async function main(argc = 0, argv = []) {
   } else {
     console.info(`Execution log file has been explicitly disabled.`);
   }
-
-  filter.forEach((el) => {
-    if(el) {
-      args.push(el);
-    }
-  });
-
-  argv.forEach((arg, idx) => {
+  console.log(args);
+  args.forEach((arg, idx) => {
     if(!arg) {
       return;
     }
@@ -229,7 +245,7 @@ async function main(argc = 0, argv = []) {
 console.debug(`source:${sourceStr}`);
       args.push(`${sourceStr}`);
     } else if(arg.includes("source:") == false) {
-      console.error(`CRITICAL: A source path must be given.`);
+      // console.error(`CRITICAL: A source path must be given.`);
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
@@ -238,7 +254,7 @@ console.debug(`source:${sourceStr}`);
 console.debug(`dest:${destStr}`);
       args.push(`${destStr}`);
     } else if(args.includes(`dest:`) == false) {
-      console.error(`CRITICAL: A destination path must be given.`);
+      // console.error(`CRITICAL: A destination path must be given.`);
     }
 
   });
@@ -248,7 +264,12 @@ console.debug(`dest:${destStr}`);
 }
 
 // IMPORTANT(jeff): We are needing the right array count for **only** the end-user passed input
-let args = [process.argv.shift(),process.argv];
+let args = process && process.argv || [];
+if(args.length > 1) {
+  args.shift();
+  args.shift();
+}
+
 let numArgs = args.length;
 main(numArgs, args);
 //main(process.argv.length, process.argv);
